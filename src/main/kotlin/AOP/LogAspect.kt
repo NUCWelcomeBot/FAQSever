@@ -2,6 +2,7 @@ package AOP
 
 import com.faq.javacustomerserver.Config.Redis.RedisService
 import org.aspectj.lang.JoinPoint
+import org.aspectj.lang.annotation.After
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.aspectj.lang.annotation.Pointcut
@@ -25,7 +26,7 @@ class LogAspect {
 
     }
 
-    @Before(value = "KeyWordAspect()") // 写了一半，没写完
+    @After(value = "KeyWordAspect()") // 写了一半，没写完
     private fun doBefore(joinPoint: JoinPoint){
         val attributes:ServletRequestAttributes = RequestContextHolder.getRequestAttributes()
                 as ServletRequestAttributes
