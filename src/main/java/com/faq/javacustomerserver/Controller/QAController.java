@@ -92,7 +92,7 @@ public class QAController {
         qaEntity.addKeyEntities(keyEntity);
         keyMapper.save(keyEntity);
     }
-    @KeyWordLog // 之后采用该注解直接实现数据统计
+//    @KeyWordLog // 之后采用该注解直接实现数据统计
     @ApiOperation(value = "通过问题id获取问题实体(答案)", notes = "需要传入问题id(id)")
     @GetMapping("/getQA/{id}")
     public ResponseResult<QAEntity> getQA(@PathVariable Integer id) {

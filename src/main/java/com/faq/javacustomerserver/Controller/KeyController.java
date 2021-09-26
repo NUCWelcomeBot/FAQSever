@@ -57,7 +57,7 @@ public class KeyController {
         modMapper.save(modEntity);
         return new ResponseResult<>(Code.SUCCESS, keyEntity);
     }
-    @KeyWordLog
+//    @KeyWordLog
     @ApiOperation(value = "通过关键词获取关键词及其所属问题", notes = "需要传入关键词(keyword)")
     @GetMapping("/getKey/{keyword}")
     public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable String keyword) {
