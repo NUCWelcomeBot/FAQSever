@@ -8,6 +8,7 @@
 package com.faq.javacustomerserver.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.faq.javacustomerserver.annotation.AfterAspect;
 import com.faq.javacustomerserver.dao.Mapper.KeyMapper;
 import com.faq.javacustomerserver.dao.Mapper.ModMapper;
 import com.faq.javacustomerserver.dao.Mapper.QAMapper;
@@ -62,7 +63,7 @@ public class KeyController {
         KeyEntity keyEntity = keyMapper.findByKeyword(keyword);
         return new ResponseResult<>(Code.SUCCESS, keyEntity);
     }
-
+    @AfterAspect
     @ApiOperation(value = "获取应用全部关键词")
     @GetMapping("/{applyId}/getAllKey")
     public ResponseResult<Collection<KeyEntity>> getFrequentQA(@PathVariable Integer applyId) {
