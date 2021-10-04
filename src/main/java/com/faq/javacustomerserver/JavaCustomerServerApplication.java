@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = {"com.faq.javacustomerserver.DAO"})
+@EnableJpaRepositories(basePackages = {"com.faq.javacustomerserver.dao"})
 @EnableCaching
 @EnableSwagger2
 public class JavaCustomerServerApplication {
