@@ -37,9 +37,8 @@ public class NoticeController {
     }
 
     @ApiOperation(value = "通过id获取通知所有信息", notes = "需要传入(id)")
-    @GetMapping("/getNotice")
-    public ResponseResult<NoticeEntity> getNotice(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
+    @GetMapping("/getNotice/{id}")
+    public ResponseResult<NoticeEntity> getNotice(@PathVariable Integer id) {
         NoticeEntity noticeEntity = noticeMapper.getById(id);
         return new ResponseResult<>(Code.SUCCESS, noticeEntity);
     }
@@ -52,9 +51,8 @@ public class NoticeController {
     }
 
     @ApiOperation(value = "通过id删除通知", notes = "需要传入(id)")
-    @DeleteMapping("/deleteNotice")
-    public ResponseResult<String> deleteNotice(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
+    @DeleteMapping("/deleteNotice/{id}")
+    public ResponseResult<String> deleteNotice(@PathVariable Integer id) {
         noticeMapper.deleteById(id);
         return new ResponseResult<>(Code.SUCCESS, "删除成功！");
     }

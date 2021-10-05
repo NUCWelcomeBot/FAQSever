@@ -18,11 +18,17 @@ import com.faq.javacustomerserver.utils.Code;
 import com.faq.javacustomerserver.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Api(tags = "关键词管理")
 @RestController
@@ -30,21 +36,18 @@ import java.util.Collection;
 public class KeyController {
 
     @Autowired
-    private QAMapper qaMapper;
-
-    @Autowired
     KeyMapper keyMapper;
     @Autowired
     ModMapper modMapper;
 
-    @ApiOperation(value = "保存关键词", notes = "需要传入关键词(keyword)")
+    @ApiOperation(value = "保存关键词", notes = "需要传入uuid模板名(modId)和关键词(keyword)")
     @PostMapping("/saveKey")
     public ResponseResult<KeyEntity> saveKey(@RequestBody JSONObject jsonObject) {
-        String mod = jsonObject.getString("mod");
+        Integer modId = jsonObject.getInteger("modId");
         String keyword = jsonObject.getString("keyword");
-        ModEntity modEntity = modMapper.findByModName(mod);
-        for(KeyEntity key : modEntity.getKeyEntities()){
-            if(key.getKeyword().equals(keyword)){
+        ModEntity modEntity = modMapper.getById(modId);
+        for (KeyEntity key : modEntity.getKeyEntities()) {
+            if (key.getKeyword().equals(keyword)) {
                 throw new KeyAlreadyExistsException("key已存在或该应用不存在");
             }
         }
@@ -56,39 +59,53 @@ public class KeyController {
         modMapper.save(modEntity);
         return new ResponseResult<>(Code.SUCCESS, keyEntity);
     }
-//    @KeyWordLog
-    @ApiOperation(value = "通过关键词获取关键词及其所属问题", notes = "需要传入关键词(keyword)")
-    @GetMapping("/getKey/{keyword}")
-    public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable String keyword) {
-        KeyEntity keyEntity = keyMapper.findByKeyword(keyword);
+
+    //    @KeyWordLog
+    @ApiOperation(value = "通过关键词获取关键词及其所属问题", notes = "需要传入关键词id")
+    @GetMapping("/getKey/{id}")
+    public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable Integer id) {
+        KeyEntity keyEntity = keyMapper.getById(id);
+        keyEntity.setCount(keyEntity.getCount() + 1);
+        keyMapper.save(keyEntity);
         return new ResponseResult<>(Code.SUCCESS, keyEntity);
     }
-    @AfterAspect
-    @ApiOperation(value = "获取应用全部关键词")
-    @GetMapping("/{applyId}/getAllKey")
-    public ResponseResult<Collection<KeyEntity>> getFrequentQA(@PathVariable Integer applyId) {
-        ModEntity modEntity = modMapper.findById(applyId).get();
-        Collection<KeyEntity> keyEntities = modEntity.getKeyEntities();
-        return new ResponseResult<>(Code.SUCCESS, keyEntities);
+
+    @ApiOperation(value = "获取常用的关键词(默认五个)", notes = "传入你需要的点击数前多少名的数量(num)大小")
+    @GetMapping("/getFreQuentKey/{num}")
+    public ResponseResult<List<KeyEntity>> getFrequentQA(@PathVariable Integer num) {
+        int numTemp = 5;
+        if (num != null) {
+            numTemp = num;
+        }
+        PageRequest pageable = PageRequest.of(0, numTemp, Sort.Direction.DESC, "count");
+        return getListResponseResult(pageable);
+    }
+
+    @NotNull
+    private ResponseResult<List<KeyEntity>> getListResponseResult(PageRequest pageable) {
+        Page<KeyEntity> keyEntities = keyMapper.findAll(pageable);
+        List<KeyEntity> keyEntityList = new ArrayList<>();
+        for (KeyEntity keyEntity : keyEntities) {
+            keyEntityList.add(keyEntity);
+        }
+        return new ResponseResult<>(Code.SUCCESS, keyEntityList);
     }
 
     @ApiOperation(value = "通过关键词id删除关键词", notes = "需要传入关键词id(id)")
-    @DeleteMapping("/deleteKey")
-    public ResponseResult<String> deleteQA(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
-        keyMapper.deleteById(id);
+    @DeleteMapping("/deleteKey/{id}")
+    public ResponseResult<String> deleteQA(@PathVariable Integer id) {
+        keyMapper.deleteKey(id);
         return new ResponseResult<>(Code.SUCCESS, "删除成功");
     }
 
     @ApiOperation(value = "通过关键词id修改关键词", notes = "需要传入关键词id(id)和关键词(keyword)")
-    @PutMapping("/updateKey")
-    public ResponseResult<KeyEntity> updateQA(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
-        String keyword = jsonObject.getString("keyword");
+    @PutMapping("/updateKey/{id}/{keyword}")
+    public ResponseResult<String> updateQA(@PathVariable Integer id,
+                                           @PathVariable String keyword) {
         KeyEntity keyEntity = keyMapper.getById(id);
         keyEntity.setKeyword(keyword);
         keyMapper.save(keyEntity);
-        return new ResponseResult<>(Code.SUCCESS, keyEntity);
+        return new ResponseResult<>(Code.SUCCESS, "更新成功");
     }
 
 }

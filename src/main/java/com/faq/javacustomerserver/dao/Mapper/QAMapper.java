@@ -13,6 +13,4 @@ public interface QAMapper extends JpaRepository<QAEntity,Integer> {
     @Transactional
     @Query(value="delete from QAEntity qa where qa.id =?1")
     void deleteQA(int id);
-
-    QAEntity findByQuestion(String question);
 }

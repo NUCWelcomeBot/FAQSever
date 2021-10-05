@@ -37,25 +37,23 @@ public class ModController {
     public ResponseResult<ModEntity> saveMod(@RequestBody JSONObject jsonObject) {
         String modName = jsonObject.getString("modName");
         Integer uuid = jsonObject.getInteger("uuid");
-        ModEntity modEntity = new ModEntity();
         UserEntity userEntity = userMapper.findByUuid(uuid);
-        if(Objects.requireNonNull(modEntity).getUserEntity().equals(userEntity)
-                && modMapper.findByModName(modName) != null){
-            throw new KeyAlreadyExistsException("该问题已存在");
-        }else {
-            modEntity.setModName(modName);
-            modEntity.setUserEntity(userEntity);
-            modMapper.save(modEntity);
+        ModEntity modEntity = new ModEntity();
+        for (ModEntity entity : userEntity.getModEntities()) {
+            if (entity.getModName().equals(modName)) {
+                throw new KeyAlreadyExistsException("该模板已存在");
+            }
         }
+        modEntity.setModName(modName);
+        modEntity.setUserEntity(userEntity);
+        modMapper.save(modEntity);
         return new ResponseResult<>(Code.SUCCESS, modEntity);
     }
 
-    @ApiOperation(value = "通过模板名称获取模板", notes = "需要传入模板的名称(modName)")
-    @GetMapping("/getMod")
-    public ResponseResult<ModEntity> getMod(@RequestBody JSONObject jsonObject) {
-        String modName = jsonObject.getString("modName");
-        ModEntity modEntity = modMapper.findByModName(modName);
-        return new ResponseResult<>(Code.SUCCESS, modEntity);
+    @ApiOperation(value = "通过模板id获取模板", notes = "需要传入模板的id(modId)")
+    @GetMapping("/getMod/{modId}")
+    public ResponseResult<ModEntity> getMod(@PathVariable Integer modId) {
+        return new ResponseResult<>(Code.SUCCESS, modMapper.getById(modId));
     }
 
     @ApiOperation(value = "获取全部模板")
@@ -66,22 +64,22 @@ public class ModController {
     }
 
     @ApiOperation(value = "通过模板id删除模板", notes = "需要传入模板的id(id)")
-    @DeleteMapping("/deleteMod")
+    @DeleteMapping("/deleteMod/{id}")
     @Transactional
-    public ResponseResult<String> deleteMod(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
-        modMapper.deleteById(id);
+    public ResponseResult<String> deleteMod(@PathVariable Integer id) {
+        modMapper.deleteModQa(id);
+        modMapper.deleteModKey(id);
+        modMapper.deleteMod(id);
         return new ResponseResult<>(Code.SUCCESS, "删除成功！");
     }
 
     @ApiOperation(value = "通过模板id修改模板", notes = "需要传入模板的id(id)和模板的名称(modName)")
-    @PostMapping("/updateMod")
-    public ResponseResult<String> updateMod(@RequestBody JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
-        String modName = jsonObject.getString("modName");
+    @PostMapping("/updateMod/{id}/{modName}")
+    public ResponseResult<String> updateMod(@PathVariable Integer id,
+                                            @PathVariable String modName) {
         ModEntity modEntity = modMapper.getById(id);
         modEntity.setModName(modName);
         modMapper.save(modEntity);
-        return new ResponseResult<>(Code.SUCCESS, "删除成功！");
+        return new ResponseResult<>(Code.SUCCESS, "更新成功！");
     }
 }

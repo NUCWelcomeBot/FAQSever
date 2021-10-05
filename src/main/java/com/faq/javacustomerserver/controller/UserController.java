@@ -1,12 +1,6 @@
-package com.faq.javacustomerserver.controller;/*
- *   #-*- coding = utf-8 -*-
- *   #@Time: 2021/8/19 22:04
- *   #@Author：dodo
- *   #@Software：IntelliJ IDEA
- */
-import com.alibaba.fastjson.JSONObject;
+package com.faq.javacustomerserver.controller;
 import com.faq.javacustomerserver.dao.Model.UserEntity;
-import com.faq.javacustomerserver.dao.Mapper.*;
+import com.faq.javacustomerserver.dao.Mapper.UserMapper;
 import com.faq.javacustomerserver.utils.Code;
 import com.faq.javacustomerserver.utils.ResponseResult;
 import io.swagger.annotations.Api;
@@ -34,9 +28,8 @@ public class UserController {
     }
 
     @ApiOperation(value = "通过uuid获取用户所有信息", notes = "需要传入(uuid)")
-    @GetMapping("/getUser")
-    public ResponseResult<UserEntity> getUser(@RequestBody JSONObject jsonObject) {
-        Integer uuid = jsonObject.getInteger("uuid");
+    @GetMapping("/getUser/{uuid}")
+    public ResponseResult<UserEntity> getUser(@PathVariable Integer uuid){
         UserEntity userEntity = userMapper.findByUuid(uuid);
         return new ResponseResult<>(Code.SUCCESS, userEntity);
     }
@@ -49,9 +42,8 @@ public class UserController {
     }
 
     @ApiOperation(value = "通过uuid删除用户", notes = "需要传入(uuid)")
-    @DeleteMapping("/deleteUser")
-    public ResponseResult<String> deleteUser(@RequestBody JSONObject jsonObject) {
-        Integer uuid = jsonObject.getInteger("uuid");
+    @DeleteMapping("/deleteUser/{uuid}")
+    public ResponseResult<String> deleteUser(@PathVariable Integer uuid) {
         userMapper.removeByUuid(uuid);
         return new ResponseResult<>(Code.SUCCESS, "删除成功！");
     }
