@@ -26,8 +26,10 @@ public class NoticeController {
     @PostMapping("/saveNotice")
     public ResponseResult<NoticeEntity> saveNotice(@RequestBody JSONObject jsonObject) {
         String content = jsonObject.getString("content");
+        String title = jsonObject.getString("title");
         NoticeEntity noticeEntity = new NoticeEntity();
         noticeEntity.setContent(content);
+        noticeEntity.setTitle(title);
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s = simpleDateFormat.format(date);

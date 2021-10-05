@@ -15,6 +15,8 @@ public class NoticeEntity {
     private Integer id = 0;
     @ApiModelProperty("通知内容")
     private String content;
+    @ApiModelProperty("通知标题")
+    private String title;
     @ApiModelProperty("编辑时间")
     private String time;
 
@@ -45,5 +47,14 @@ public class NoticeEntity {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    @Column(name = "title")
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
