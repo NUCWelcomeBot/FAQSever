@@ -11,14 +11,12 @@ import org.springframework.stereotype.Component;
 public class AfterAspect {
     @After("@annotation(com.faq.javacustomerserver.annotation.AfterKeyCutPoint)")
     public void afterKeyCutPoint(JoinPoint joinPoint){
-        System.out.println("this is before output message");
         var args = joinPoint.getArgs();
         for(Object arg:args)
             System.out.println("args:"+arg);
     }
     @After("@annotation(com.faq.javacustomerserver.annotation.AfterQACutPoint)")
     public void afterQACutPoint(JoinPoint joinPoint){
-        System.out.println("this is before output message");
         var args = joinPoint.getArgs();
         for(Object arg:args)
             System.out.println("args:"+arg);
