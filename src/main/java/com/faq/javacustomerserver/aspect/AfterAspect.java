@@ -11,14 +11,10 @@ import org.springframework.stereotype.Component;
 public class AfterAspect {
     @After("@annotation(com.faq.javacustomerserver.annotation.AfterKeyCutPoint)")
     public void afterKeyCutPoint(JoinPoint joinPoint){
-        var args = joinPoint.getArgs();
-        for(Object arg:args)
-            System.out.println("args:"+arg);
+        // 参考before中的代码，可随意定义，JoinPoint为所AOP所修饰的函数参数
     }
     @After("@annotation(com.faq.javacustomerserver.annotation.AfterQACutPoint)")
     public void afterQACutPoint(JoinPoint joinPoint){
-        var args = joinPoint.getArgs();
-        for(Object arg:args)
-            System.out.println("args:"+arg);
+        // 参考before中的代码，可随意定义，JoinPoint为所AOP所修饰的函数参数
     }
 }
