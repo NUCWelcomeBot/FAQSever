@@ -10,6 +10,7 @@ package com.faq.javacustomerserver.controller;
 import GsonModel.DemoOkhttp;
 import GsonModel.ExtractKeyword;
 import com.alibaba.fastjson.JSONObject;
+import com.faq.javacustomerserver.annotation.BeforeQACutPoint;
 import com.faq.javacustomerserver.dao.Mapper.KeyMapper;
 import com.faq.javacustomerserver.dao.Mapper.ModMapper;
 import com.faq.javacustomerserver.dao.Mapper.QAMapper;
@@ -74,13 +75,11 @@ public class QAController {
     }
 
     // @KeyWordLog // 之后采用该注解直接实现数据统计
+    @BeforeQACutPoint
     @ApiOperation(value = "通过问题id获取问题实体(答案)", notes = "需要传入问题id(id)")
     @GetMapping("/getQA/{id}")
     public ResponseResult<QAEntity> getQA(@PathVariable Integer id) {
-        QAEntity qaEntity = qaMapper.getById(id);
-        qaEntity.setCount(qaEntity.getCount() + 1);
-        qaMapper.save(qaEntity);
-        return new ResponseResult<>(Code.SUCCESS, qaEntity);
+        return new ResponseResult<>(Code.SUCCESS, qaMapper.getById(id));
     }
 
     @ApiOperation(value = "获取当前页面(num)问题", notes = "需要传入页数(num)[从1开始]")

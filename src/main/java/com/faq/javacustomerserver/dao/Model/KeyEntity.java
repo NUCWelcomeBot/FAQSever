@@ -31,15 +31,15 @@ public class KeyEntity {
     private Collection<QAEntity> qaEntities;
 
     public void setCount(Integer count) {
-        this.count += count;
+        this.count = count;
     }
 
     @Column(name = "count",nullable = false)
     public Integer getCount() {
         return count;
     }
-    public void setCount() {
-        ++this.count;
+    public void addCount() {
+        this.count+=1;
     }
 
     @ManyToOne()

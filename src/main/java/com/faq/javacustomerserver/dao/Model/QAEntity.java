@@ -65,9 +65,12 @@ public class QAEntity {
     }
 
     public void setCount(Integer count) {
-        this.count += count;
+        this.count = count;
     }
 
+    public void addCount(){
+        this.count++;
+    }
 
     @ManyToOne()
     @JsonIgnore

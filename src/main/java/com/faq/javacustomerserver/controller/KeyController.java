@@ -8,10 +8,9 @@
 package com.faq.javacustomerserver.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.faq.javacustomerserver.annotation.AfterAspect;
+import com.faq.javacustomerserver.annotation.BeforeKeyCutPoint;
 import com.faq.javacustomerserver.dao.Mapper.KeyMapper;
 import com.faq.javacustomerserver.dao.Mapper.ModMapper;
-import com.faq.javacustomerserver.dao.Mapper.QAMapper;
 import com.faq.javacustomerserver.dao.Model.KeyEntity;
 import com.faq.javacustomerserver.dao.Model.ModEntity;
 import com.faq.javacustomerserver.utils.Code;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Api(tags = "关键词管理")
@@ -61,13 +59,11 @@ public class KeyController {
     }
 
     //    @KeyWordLog
+    @BeforeKeyCutPoint
     @ApiOperation(value = "通过关键词获取关键词及其所属问题", notes = "需要传入关键词id")
     @GetMapping("/getKey/{id}")
     public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable Integer id) {
-        KeyEntity keyEntity = keyMapper.getById(id);
-        keyEntity.setCount(keyEntity.getCount() + 1);
-        keyMapper.save(keyEntity);
-        return new ResponseResult<>(Code.SUCCESS, keyEntity);
+        return new ResponseResult<>(Code.SUCCESS, keyMapper.getById(id));
     }
 
     @ApiOperation(value = "获取常用的关键词(默认五个)", notes = "传入你需要的点击数前多少名的数量(num)大小")

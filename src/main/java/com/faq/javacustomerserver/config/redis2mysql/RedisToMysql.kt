@@ -31,16 +31,16 @@ class RedisToMysql {
                 val id = args[2].toInt()
                 val count = redisService?.get(key) as Int;
                 when(args[1]){
-                    "Key"->{
-                        val keyObj: KeyEntity = keyMapper!!.findById(id).get()
-                        keyObj.count = count
-                        keyMapper.save(keyObj)
-                    }
-                    "Q"->{
-                        val QAObj: QAEntity = QAMapper!!.findById(id).get()
-                        QAObj.count = count
-                        QAMapper.save(QAObj)
-                    }
+//                    "Key"->{
+//                        val keyObj: KeyEntity = keyMapper!!.findById(id).get()
+//                        keyObj.count = count
+//                        keyMapper.save(keyObj)
+//                    }
+//                    "Q"->{
+//                        val QAObj: QAEntity = QAMapper!!.findById(id).get()
+//                        QAObj.count = count
+//                        QAMapper.save(QAObj)
+//                    }
                 }
                 redisService.deleteKeys(key)
             }
