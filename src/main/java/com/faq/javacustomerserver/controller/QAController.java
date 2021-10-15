@@ -30,10 +30,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collector;
 
 @Api(tags = "问题管理")
 @RestController
@@ -54,44 +52,63 @@ public class QAController {
         String question = jsonObject.getString("question");
         String answer = jsonObject.getString("answer");
         Integer modId = jsonObject.getInteger("modId");
-        Integer keyId = jsonObject.getInteger("keyId");
         ModEntity modEntity = modMapper.getById(modId);
-        KeyEntity keyEntity = keyMapper.getById(keyId);
         QAEntity qaEntity = new QAEntity();
-
-        for (QAEntity entity : modEntity.getQaEntities()) {
-            if (entity.getQuestion().equals(question)) {
-                throw new KeyAlreadyExistsException("该问题已存在");
-            }
+        if (modEntity.getQaEntities()
+                .stream()
+                .parallel()
+                .anyMatch(
+                        tqa->tqa.getQuestion().equals(question))){
+            throw new KeyAlreadyExistsException("该问题已存在");
         }
         qaEntity.setQuestion(question);
         qaEntity.setAnswer(answer);
-        qaEntity.setCount(0);
         qaEntity.setModEntity(modEntity);
-
-        qaEntity.addKeyEntities(keyEntity);
-        qaMapper.save(qaEntity);
+        HashMap headers = new HashMap();
+        headers.put("sentence",question);
+        ExtractKeyword responseDataClass = DemoOkhttp.Companion.post(extractKeywordUrl,headers);
+        var keys  = modEntity.getKeyEntities();
+        for(String key : Objects.requireNonNull(responseDataClass.component3())){
+            var tKey = keys.stream().parallel().filter(tkey -> tkey.getKeyword().equals(key)).findFirst();
+            KeyEntity keyEntity = tKey.orElse(null);
+            saveKeyAndQA(keyEntity,qaEntity,modEntity,key);
+        }
         return new ResponseResult<>(Code.SUCCESS, qaEntity);
     }
-
+    private void saveKeyAndQA(KeyEntity keyEntity,QAEntity qaEntity,ModEntity modEntity,String key){
+        if (keyEntity == null){
+            keyEntity = new KeyEntity();
+            keyEntity.setKeyword(key);
+            keyEntity.setModEntity(modEntity);
+        }
+        keyEntity.addQaEntities(qaEntity);
+        qaEntity.addKeyEntities(keyEntity);
+        qaMapper.save(qaEntity);
+        keyMapper.save(keyEntity);
+    }
     // @KeyWordLog // 之后采用该注解直接实现数据统计
     @BeforeQACutPoint
     @ApiOperation(value = "通过问题id获取问题实体(答案)", notes = "需要传入问题id(id)")
-    @GetMapping("/getQA/{id}")
-    public ResponseResult<QAEntity> getQA(@PathVariable Integer id) {
-        return new ResponseResult<>(Code.SUCCESS, qaMapper.getById(id));
+    @GetMapping("/getQA/{QAId}")
+    public ResponseResult<QAEntity> getQA(@PathVariable Integer QAId) {
+        return new ResponseResult<>(Code.SUCCESS, qaMapper.getById(QAId));
     }
 
+    @ApiOperation(value = "通过问题id获取Mod QA List", notes = "需要传入问题id(id)")
+    @GetMapping("/getModAllQA/{modId}")
+    public ResponseResult< Collection<QAEntity>> getModAllQA(@PathVariable Integer modId) {
+        return new ResponseResult<>(Code.SUCCESS, modMapper.getById(modId).getQaEntities());
+    }
     @ApiOperation(value = "获取当前页面(num)问题", notes = "需要传入页数(num)[从1开始]")
-    @GetMapping("/getQAByPage/{num}")
-    public ResponseResult<List<QAEntity>> getQAByPage(@PathVariable Integer num) {
+    @GetMapping("/getQAByPage/{modelId}/{num}")
+    public ResponseResult<List<QAEntity>> getQAByPage(@PathVariable Integer modelId,@PathVariable Integer num) {
         PageRequest pageable = PageRequest.of(num - 1, 10);
         return getListResponseResult(pageable);
     }
 
     @ApiOperation(value = "获取常用的问题(默认五个)", notes = "传入你需要的点击数前多少名的数量(num)大小")
-    @GetMapping("/getFreQuentQA/{num}")
-    public ResponseResult<List<QAEntity>> getFrequentQA(@PathVariable(required = false) Integer num) {
+    @GetMapping("/getFreQuentQA/{modelId}/{num}")
+    public ResponseResult<List<QAEntity>> getFrequentQA(@PathVariable Integer modelId,@PathVariable(required = false) Integer num) {
         int numTemp = 5;
         if (num != null) {
             numTemp = num;
@@ -118,9 +135,9 @@ public class QAController {
     }
 
     @ApiOperation(value = "通过问题id修改问题实体答案", notes = "需要传入问题(id)和问题(answer)")
-    @PutMapping("/updateQA/{id}/{answer}")
+    @PutMapping("/updateQA/{id}")
     public ResponseResult<QAEntity> updateQA(@PathVariable Integer id,
-                                             @PathVariable String answer) {
+                                             @RequestParam("answer") String answer) {
         QAEntity qaEntity = qaMapper.getById(id);
         qaEntity.setAnswer(answer);
         qaMapper.save(qaEntity);

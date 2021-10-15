@@ -12,4 +12,5 @@ public interface KeyMapper extends JpaRepository<KeyEntity,Integer> {
     @Transactional
     @Query(value="delete from KeyEntity qa where qa.id =?1")
     void deleteKey(int id);
+    KeyEntity getByKeyword(String keyword);
 }

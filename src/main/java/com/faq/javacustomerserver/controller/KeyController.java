@@ -13,6 +13,7 @@ import com.faq.javacustomerserver.dao.Mapper.KeyMapper;
 import com.faq.javacustomerserver.dao.Mapper.ModMapper;
 import com.faq.javacustomerserver.dao.Model.KeyEntity;
 import com.faq.javacustomerserver.dao.Model.ModEntity;
+import com.faq.javacustomerserver.dao.Model.QAEntity;
 import com.faq.javacustomerserver.utils.Code;
 import com.faq.javacustomerserver.utils.ResponseResult;
 import io.swagger.annotations.Api;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Api(tags = "关键词管理")
@@ -65,7 +67,11 @@ public class KeyController {
     public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable Integer id) {
         return new ResponseResult<>(Code.SUCCESS, keyMapper.getById(id));
     }
-
+    @ApiOperation(value = "通过问题id获取Mod QA List", notes = "需要传入问题id(id)")
+    @GetMapping("/getModAllKey/{modId}")
+    public ResponseResult<Collection<KeyEntity>> getModAllQA(@PathVariable Integer modId) {
+        return new ResponseResult<>(Code.SUCCESS, modMapper.getById(modId).getKeyEntities());
+    }
     @ApiOperation(value = "获取常用的关键词(默认五个)", notes = "传入你需要的点击数前多少名的数量(num)大小")
     @GetMapping("/getFreQuentKey/{num}")
     public ResponseResult<List<KeyEntity>> getFrequentQA(@PathVariable Integer num) {
