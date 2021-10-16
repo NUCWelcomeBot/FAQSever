@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,9 +59,9 @@ public class ModController {
     }
 
     @ApiOperation(value = "获取全部模板")
-    @GetMapping("/getAllMod")
-    public ResponseResult<List<ModEntity>> getAllUser() {
-        List<ModEntity> modEntities = modMapper.findAll();
+    @GetMapping("/getAllModByUser/{userId}")
+    public ResponseResult<Collection<ModEntity>> getAllUser(@PathVariable Integer userId) {
+        Collection<ModEntity> modEntities= userMapper.findById(userId).get().getModEntities();
         return new ResponseResult<>(Code.SUCCESS, modEntities);
     }
 

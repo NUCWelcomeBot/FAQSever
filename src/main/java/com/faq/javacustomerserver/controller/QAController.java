@@ -57,8 +57,7 @@ public class QAController {
         if (modEntity.getQaEntities()
                 .stream()
                 .parallel()
-                .anyMatch(
-                        tqa->tqa.getQuestion().equals(question))){
+                .anyMatch(tqa->tqa.getQuestion().equals(question))){
             throw new KeyAlreadyExistsException("该问题已存在");
         }
         qaEntity.setQuestion(question);
@@ -84,7 +83,6 @@ public class QAController {
         keyEntity.addQaEntities(qaEntity);
         qaEntity.addKeyEntities(keyEntity);
         qaMapper.save(qaEntity);
-        keyMapper.save(keyEntity);
     }
     // @KeyWordLog // 之后采用该注解直接实现数据统计
     @BeforeQACutPoint
