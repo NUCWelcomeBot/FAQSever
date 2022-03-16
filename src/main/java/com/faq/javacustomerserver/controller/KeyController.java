@@ -41,7 +41,7 @@ public class KeyController {
     ModMapper modMapper;
 
     @ApiOperation(value = "保存关键词", notes = "需要传入uuid模板名(modId)和关键词(keyword)")
-    @PostMapping("/saveKey")
+    @PostMapping("/key")
     public ResponseResult<KeyEntity> saveKey(@RequestBody JSONObject jsonObject) {
         Integer modId = jsonObject.getInteger("modId");
         String keyword = jsonObject.getString("keyword");
@@ -63,17 +63,17 @@ public class KeyController {
     //    @KeyWordLog
     @BeforeKeyCutPoint
     @ApiOperation(value = "通过关键词获取关键词及其所属问题", notes = "需要传入关键词id")
-    @GetMapping("/getKey/{id}")
+    @GetMapping("/key/{id}")
     public ResponseResult<KeyEntity> getQAByAnswer(@PathVariable Integer id) {
         return new ResponseResult<>(Code.SUCCESS, keyMapper.getById(id));
     }
     @ApiOperation(value = "通过问题id获取Mod QA List", notes = "需要传入问题id(id)")
-    @GetMapping("/getModAllKey/{modId}")
+    @GetMapping("/modAllKey/{modId}")
     public ResponseResult<Collection<KeyEntity>> getModAllQA(@PathVariable Integer modId) {
         return new ResponseResult<>(Code.SUCCESS, modMapper.getById(modId).getKeyEntities());
     }
     @ApiOperation(value = "获取常用的关键词(默认五个)", notes = "传入你需要的点击数前多少名的数量(num)大小")
-    @GetMapping("/getFreQuentKey/{num}")
+    @GetMapping("/freQuentKey/{num}")
     public ResponseResult<List<KeyEntity>> getFrequentQA(@PathVariable Integer num) {
         int numTemp = 5;
         if (num != null) {
@@ -94,14 +94,14 @@ public class KeyController {
     }
 
     @ApiOperation(value = "通过关键词id删除关键词", notes = "需要传入关键词id(id)")
-    @DeleteMapping("/deleteKey/{id}")
+    @DeleteMapping("/key/{id}")
     public ResponseResult<String> deleteQA(@PathVariable Integer id) {
         keyMapper.deleteKey(id);
         return new ResponseResult<>(Code.SUCCESS, "删除成功");
     }
 
     @ApiOperation(value = "通过关键词id修改关键词", notes = "需要传入关键词id(id)和关键词(keyword)")
-    @PutMapping("/updateKey/{id}/{keyword}")
+    @PutMapping("/key/{id}/{keyword}")
     public ResponseResult<String> updateQA(@PathVariable Integer id,
                                            @PathVariable String keyword) {
         KeyEntity keyEntity = keyMapper.getById(id);
